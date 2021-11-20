@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Alert } from 'react-native';
-import MapView, 
-{ 
+import { StyleSheet } from 'react-native';
+import { features } from '../assets/shapes/subprefeituras.json';
+import MapView,
+{
   Geojson,
   Callout,
-  Marker,
-  PROVIDER_GOOGLE,
-  Region 
+  Marker
 } from 'react-native-maps';
 
 import EditScreenInfo from '../components/EditScreenInfo';
@@ -21,30 +20,64 @@ const initialRegion = {
   longitudeDelta: 0.25,
 };
 
+const featuresAlert: any[] = [];
+const featuresNormal: any[] = [];
+const featuresEmergence: any[] = [];
+
+features.map(
+  feature => {
+    if (feature.properties.id === 29) {
+      featuresAlert.push(feature)
+    } else if (feature.properties.id === "04") {
+      featuresEmergence.push(feature)
+    } else {
+      featuresNormal.push(feature)
+    }
+  }
+)
+
+// const regions: GeojsonProps = {
+//   geojson: {
+//     type: 'FeatureCollection',
+//     features: []
+//   }
+// }
+
+
 export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'>) {
 
   return (
-    <MapView 
-    initialRegion={initialRegion}
-    style={{...StyleSheet.absoluteFillObject}}>
+    <MapView
+      initialRegion={initialRegion}
+      style={{ ...StyleSheet.absoluteFillObject }}>
       <Marker
-            key='123'
-            calloutAnchor={{
-              x: 2.9,
-              y: 0.8,
-            }}
-            coordinate={{
-              latitude: Number(-23.533773),
-              longitude: Number(-46.625290),
-            }}
-          >
-            <Callout tooltip>
-              <View>
-                <Text>Douglas</Text>
-                <Text></Text>
-              </View>
-            </Callout>
-          </Marker>
+        key='123'
+        calloutAnchor={{
+          x: 2.9,
+          y: 0.8,
+        }}
+        coordinate={{
+          latitude: Number(-23.533773),
+          longitude: Number(-46.625290),
+        }}
+      >
+        <Callout tooltip>
+          <View>
+            <Text>Douglas</Text>
+            <Text></Text>
+          </View>
+        </Callout>
+      </Marker>
+
+      <Geojson strokeColor={styles.strokeColor.color} fillColor="rgba(255,255,0,0.5)" strokeWidth={1}
+        geojson={{ type: 'FeatureCollection', features: featuresAlert }}></Geojson>
+
+      <Geojson strokeColor={styles.strokeColor.color} fillColor="rgba(255,255,255,0.5)" strokeWidth={1}
+        geojson={{ type: 'FeatureCollection', features: featuresNormal }}></Geojson>
+
+      <Geojson strokeColor={styles.strokeColor.color} fillColor="rgba(255,0,0,0.5)" strokeWidth={1}
+        geojson={{ type: 'FeatureCollection', features: featuresEmergence }}></Geojson>
+
     </MapView>
   );
 }
@@ -84,4 +117,8 @@ const styles = StyleSheet.create({
     color: "#005555",
     fontSize: 10,
   },
+  strokeColor: {
+    color: "rgba(0,0,0,0.5)"
+  }
 });
+
