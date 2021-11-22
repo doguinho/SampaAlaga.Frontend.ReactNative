@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet } from 'react-native';
-import { features } from '../assets/shapes/subprefeituras.json';
+import { subprefeituras } from '../assets/shapes/subprefeituras';
+
 import MapView,
 {
   Geojson,
   Callout,
-  Marker
+  Marker,
+  PROVIDER_GOOGLE
 } from 'react-native-maps';
 
 import EditScreenInfo from '../components/EditScreenInfo';
@@ -20,21 +22,28 @@ const initialRegion = {
   longitudeDelta: 0.25,
 };
 
-const featuresAlert: any[] = [];
+const alerts = ['13'] // preciso fazer o filtro pelos ids
+
+const featuresAlert: any[] = subprefeituras.features.filter(
+  sub => sub.properties.sp_codigo === "13"
+);
 const featuresNormal: any[] = [];
 const featuresEmergence: any[] = [];
 
-features.map(
-  feature => {
-    if (feature.properties.id === 29) {
-      featuresAlert.push(feature)
-    } else if (feature.properties.id === "04") {
-      featuresEmergence.push(feature)
-    } else {
-      featuresNormal.push(feature)
-    }
-  }
-)
+// subprefeituras.features.map(
+//   feature => {
+//     if (feature.properties.sp_codigo === "13") {
+//       featuresAlert.push(feature)
+//     } else if (feature.properties.sp_codigo === "32") {
+//       featuresEmergence.push(feature)
+//     } else {
+//       featuresNormal.push(feature)
+//     }
+//   }
+// )
+
+
+
 
 // const regions: GeojsonProps = {
 //   geojson: {
