@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet } from 'react-native';
+import { StyleSheet, ActivityIndicator, Platform } from 'react-native';
 import { subprefeituras } from '../assets/shapes/subprefeituras';
 import { api } from "../services/api";
+import Constants from 'expo-constants';
 
 import MapView,
 {
   Geojson,
   Callout,
-  Marker,
-  PROVIDER_GOOGLE
+  Marker
 } from 'react-native-maps';
 
 import EditScreenInfo from '../components/EditScreenInfo';
@@ -24,12 +24,7 @@ interface Situation {
   regions: number[]
 }
 
-const initialRegion = {
-  latitude: -23.7,
-  longitude: -46.6,
-  latitudeDelta: 0.5,
-  longitudeDelta: 0.5,
-};
+
 
 
 // subprefeituras.features.map(
@@ -58,24 +53,69 @@ const initialRegion = {
 
 export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'>) {
 
+  const initialRegion = {
+    latitude: -23.7,
+    longitude: -46.6,
+    latitudeDelta: 0.5,
+    longitudeDelta: 0.5,
+  };
+
+  const initialCoods = {
+    timestamp:new Date().getTime(),
+    coords:{
+      latitude:initialRegion.latitude,
+      longitude:initialRegion.longitude,
+      altitude: null, 
+      accuracy: null, 
+      altitudeAccuracy: null, 
+      heading: null, 
+      speed: null
+    }
+  }
+
   const [loading, setLoading] = useState<boolean>(true)
   const [normal, setNormal] = useState<any[]>([])
   const [attention, setAttention] = useState<any[]>([])
   const [alert, setAlert] = useState<any[]>([])
   const [overflow, setOverflow] = useState<any[]>([])
-  // const [situations, setSituations] = useState<Situation[]>([])
+  const [location, setLocation] = useState<Location.LocationObject>(initialCoods);
+  const [errorMsg, setErrorMsg] = useState<any>();
 
   async function fetchSituation() {
     const response = await api.get('/regions/situation');
     splitSituation(response.data)
     setLoading(false)
   }
-  
+
+  function getLocation() {
+
+    (async () => {
+      /* @hide */
+      if (Platform.OS === 'android' && !Constants.isDevice) {
+        setErrorMsg(
+          'Oops, this will not work on Snack in an Android emulator. Try it on your device!'
+        );
+        return;
+      }
+      /* @end */
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+    })();
+    
+  }
+
   useEffect(() => {
     fetchSituation();
+    getLocation();
   }, []);
 
-  function splitSituation(situations:Situation[]) {
+  function splitSituation(situations: Situation[]) {
 
     let notNormal: number[] = []
 
@@ -132,7 +172,10 @@ export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'
 
   return (
     <>
-      {loading ? null :
+      {loading ?
+        <View style={styles.container}>
+          <ActivityIndicator />
+        </View> :
         <MapView
           initialRegion={initialRegion}
           style={{ ...StyleSheet.absoluteFillObject }}>
@@ -144,8 +187,8 @@ export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'
               y: 0.8,
             }}
             coordinate={{
-              latitude: Number(-23.533773),
-              longitude: Number(-46.625290),
+              latitude: location?.coords.latitude,
+              longitude: location?.coords.longitude,
             }}
           >
             <Callout tooltip>
@@ -180,37 +223,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-  calloutContainer: {
-    width: 160,
-    height: "100%",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
-    borderRadius: 16,
-    justifyContent: "center",
-  },
-
-  calloutText: {
-    color: "#0089a5",
-    textDecorationLine: "underline",
-    fontSize: 14,
-  },
-
-  calloutSmallText: {
-    color: "#005555",
-    fontSize: 10,
-  },
   strokeColor: {
     color: "rgba(0,0,0,0.5)"
-  }
+  },
+
 });
 
