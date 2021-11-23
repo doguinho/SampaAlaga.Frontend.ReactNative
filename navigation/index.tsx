@@ -66,8 +66,8 @@ function BottomTabNavigator() {
         name="TabOne"
         component={TabOneScreen}
         options={({ navigation }: RootTabScreenProps<'TabOne'>) => ({
-          title: 'Regiões em Alerta',
-          tabBarIcon: ({ color }) => <TabBarIcon name="map" color={color} />,
+          title: 'Regiões monitoradas',
+          tabBarIcon: ({ color }) => <TabBarIcon name="exclamation-triangle" color={color} />,
           headerRight: () => (
             <Pressable
               onPress={() => navigation.navigate('Modal')}
@@ -89,7 +89,7 @@ function BottomTabNavigator() {
         component={TabTwoScreen}
         options={{
           title: 'Pontos de Alagamento',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="ban" color={color} />,
         }}
       />
     </BottomTab.Navigator>
