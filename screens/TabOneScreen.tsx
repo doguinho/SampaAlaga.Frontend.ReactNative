@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, ActivityIndicator, Platform } from 'react-native';
 import { subprefeituras } from '../assets/shapes/subprefeituras';
 import { api } from "../services/api";
-import Constants from 'expo-constants';
 
 import MapView,
 {
@@ -11,67 +10,14 @@ import MapView,
   Marker
 } from 'react-native-maps';
 
-import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
 import * as Location from "expo-location";
-
-interface Situation {
-  id: number,
-  color: string,
-  name: string,
-  class: string,
-  regions: number[]
-}
-
-
-
-
-// subprefeituras.features.map(
-//   feature => {
-//     if (feature.properties.sp_codigo === "13") {
-//       featuresAlert.push(feature)
-//     } else if (feature.properties.sp_codigo === "32") {
-//       featuresEmergence.push(feature)
-//     } else {
-//       featuresNormal.push(feature)
-//     }
-//   }
-// )
-
-
-// const regions: GeojsonProps = {
-//   geojson: {
-//     type: 'FeatureCollection',
-//     features: []
-//   }
-// }
-
-
-
+import { getLocation, initialCoods, initialRegion } from "../services/utils";
+import { Situation } from "../models/situation";
 
 
 export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'>) {
-
-  const initialRegion = {
-    latitude: -23.7,
-    longitude: -46.6,
-    latitudeDelta: 0.5,
-    longitudeDelta: 0.5,
-  };
-
-  const initialCoods = {
-    timestamp:new Date().getTime(),
-    coords:{
-      latitude:initialRegion.latitude,
-      longitude:initialRegion.longitude,
-      altitude: null, 
-      accuracy: null, 
-      altitudeAccuracy: null, 
-      heading: null, 
-      speed: null
-    }
-  }
 
   const [loading, setLoading] = useState<boolean>(true)
   const [normal, setNormal] = useState<any[]>([])
@@ -79,7 +25,6 @@ export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'
   const [alert, setAlert] = useState<any[]>([])
   const [overflow, setOverflow] = useState<any[]>([])
   const [location, setLocation] = useState<Location.LocationObject>(initialCoods);
-  const [errorMsg, setErrorMsg] = useState<any>();
 
   async function fetchSituation() {
     const response = await api.get('/regions/situation');
@@ -87,32 +32,14 @@ export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'
     setLoading(false)
   }
 
-  function getLocation() {
-
-    (async () => {
-      /* @hide */
-      if (Platform.OS === 'android' && !Constants.isDevice) {
-        setErrorMsg(
-          'Oops, this will not work on Snack in an Android emulator. Try it on your device!'
-        );
-        return;
-      }
-      /* @end */
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-    })();
-    
+  async function fetchLocation() {
+    const location = await getLocation();
+    setLocation(location)
   }
 
   useEffect(() => {
-    fetchSituation();
-    getLocation();
+    fetchSituation()
+    fetchLocation() 
   }, []);
 
   function splitSituation(situations: Situation[]) {
@@ -150,24 +77,6 @@ export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'
     )
 
   }
-
-  // const splitSituation = () => {
-  //   obj.forEach(
-  //     sit => {        
-
-  //       if (sit.class === 'alert') {
-  //         featuresAlert = subprefeituras.features.filter(
-  //           sub => sub.properties.sp_cod === sit.id
-  //         )
-  //       }
-
-  //       // console.log(situation[sit.class as any])
-
-
-
-  //     }
-  //   )
-  // }
 
 
   return (
