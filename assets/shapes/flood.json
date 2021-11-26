@@ -1,0 +1,36 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "marker-color": "#fff",
+          "name": "Marginal Pinheiros"
+      },
+      "geometry": {
+          "type": "Point",
+          "coordinates": [-46.7408101804006,-23.54007635295046]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+          "name": "Shopping Butantã"
+      },
+      "geometry": {
+          "type": "Point",
+          "coordinates": [-46.72768923768324,-23.578088085043596]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+          "name": "Shopping Butantã"
+      },
+      "geometry": {
+          "type": "Point",
+          "coordinates": [-46.71919574287543,-23.56246754203549]
+      }
+    }
+  ]
+}

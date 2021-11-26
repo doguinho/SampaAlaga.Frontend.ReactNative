@@ -1,16 +1,55 @@
-import * as React from 'react';
-import { StyleSheet } from 'react-native';
+/* tslint:disable */
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, StyleSheet,  } from 'react-native';
+import {features} from '../assets/shapes/flood.json';
 
-import EditScreenInfo from '../components/EditScreenInfo';
-import { Text, View } from '../components/Themed';
+import MapView,
+{
+  Geojson,
+} from 'react-native-maps';
 
-export default function TabTwoScreen() {
+import { View } from '../components/Themed';
+import { RootTabScreenProps } from '../types';
+import * as Location from "expo-location";
+import { getLocation, initialCoods, initialRegion } from "../services/utils";
+
+
+export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'>) {
+
+  const [loading, setLoading] = useState<boolean>(true)
+  const [location, setLocation] = useState<Location.LocationObject>(initialCoods);
+
+  async function fetchSituation() {
+    // const response = await api.get('/regions/situation');    
+    setLoading(false)
+  }
+
+  async function fetchLocation() {
+    const location = await getLocation();
+    setLocation(location)
+  }
+
+  useEffect(() => {
+    fetchSituation()
+    fetchLocation() 
+  }, []);
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="/screens/TabTwoScreen.tsx" />
-    </View>
+    <>
+      {loading ?
+        <View style={styles.container}>
+          <ActivityIndicator />
+        </View> :
+        <MapView
+          initialRegion={initialRegion}
+          style={{ ...StyleSheet.absoluteFillObject }}>
+
+          <Geojson fillColor="rgb(255,153,0)" strokeWidth={1} 
+            geojson={{ type: 'FeatureCollection', features: features as any }}></Geojson>
+
+        </MapView>
+      }
+    </>
   );
 }
 
@@ -20,13 +59,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  strokeColor: {
+    color: "rgba(0,0,0,0.5)"
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
+
 });
+

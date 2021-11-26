@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, ActivityIndicator, Platform } from 'react-native';
+import { StyleSheet, ActivityIndicator } from 'react-native';
 import { subprefeituras } from '../assets/shapes/subprefeituras';
 import { api } from "../services/api";
 
@@ -91,6 +91,25 @@ export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'
 
           <Marker
             key='123'
+            calloutAnchor={{
+              x: 2.9,
+              y: 0.8,
+            }}
+            coordinate={{
+              latitude: location?.coords.latitude,
+              longitude: location?.coords.longitude,
+            }}
+          >
+            <Callout tooltip>
+              <View>
+                <Text>Douglas</Text>
+                <Text>{normal.toString()}</Text>
+              </View>
+            </Callout>
+          </Marker>
+
+          <Marker
+            key='1234'
             calloutAnchor={{
               x: 2.9,
               y: 0.8,
